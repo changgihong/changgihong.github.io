@@ -84,7 +84,7 @@ export default function RootLayout({
             <div className="relative mx-auto flex w-full max-w-screen-sm flex-1 flex-col px-4 pt-20">
               <Header />
               {children}
-              <Footer className="mt-auto shrink-0" />
+              <Footer className="mt-auto" />
             </div>
           </div>
         </ThemeProvider>

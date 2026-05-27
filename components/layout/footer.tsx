@@ -1,5 +1,6 @@
 'use client'
 import { AnimatedBackground } from '@/components/ui/animated-background'
+import { cn } from '@/lib/utils'
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
@@ -65,9 +66,14 @@ function ThemeSwitch() {
   )
 }
 
-export function Footer() {
+export function Footer({ className }: { className?: string }) {
   return (
-    <footer className="mt-24 border-t border-zinc-100 px-0 py-4 dark:border-zinc-800">
+    <footer
+      className={cn(
+        'mt-24 shrink-0 border-t border-zinc-100 px-0 py-4 dark:border-zinc-800',
+        className,
+      )}
+    >
       <div className="flex items-center justify-between">
         <a
           href="https://github.com/sscoderati"
