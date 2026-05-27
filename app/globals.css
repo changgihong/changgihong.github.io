@@ -28,6 +28,7 @@
   }
   html {
     @apply font-sans;
+    overflow-anchor: none;
   }
 }
 
