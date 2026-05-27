@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/morphing-dialog'
 import { Spotlight } from '@/components/ui/spotlight'
 import type { BlogListItem } from '@/lib/blog'
+import { formatTotalWorkExperience } from '@/lib/work-experience'
 import { formatWikiDate } from '@/lib/wiki-date'
 import { motion } from 'motion/react'
 import Link from 'next/link'
@@ -145,9 +146,14 @@ export default function HomeClient({
         variants={VARIANTS_SECTION}
         transition={TRANSITION_SECTION}
       >
-        <h3 className="mb-5 text-lg font-medium dark:text-zinc-100">
-          Work Experience
-        </h3>
+        <div className="mb-5 flex items-center justify-between">
+          <h3 className="text-lg font-medium dark:text-zinc-100">
+            Work Experience
+          </h3>
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">
+            총 {formatTotalWorkExperience(WORK_EXPERIENCE)}
+          </span>
+        </div>
         <div className="flex flex-col space-y-2">
           {WORK_EXPERIENCE.map((job) => (
             <MorphingDialog
