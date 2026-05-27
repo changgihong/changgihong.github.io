@@ -76,7 +76,7 @@ export function Footer({ className }: { className?: string }) {
     >
       <div className="flex items-center justify-between">
         <a
-          href="https://github.com/sscoderati"
+          href="https://github.com/changgihong"
           target="_blank"
           rel="noopener noreferrer"
         >

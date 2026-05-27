@@ -51,9 +51,9 @@ export const WORK_EXPERIENCE: WorkExperience[] = [
 ]
 
 export const SOCIAL_LINKS: SocialLink[] = [
-  { label: 'Github', link: 'https://github.com/sscoderati' },
+  { label: 'Github', link: 'https://github.com/changgihong' },
   { label: 'X', link: 'https://x.com/sscoderati' },
-  { label: 'LinkedIn', link: 'https://www.linkedin.com/in/sscoderati' },
+  { label: 'LinkedIn', link: 'https://www.linkedin.com/in/changgihong' },
 ]
 
 export const EMAIL = 'chungup5495@gmail.com'
