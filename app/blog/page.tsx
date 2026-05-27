@@ -14,7 +14,7 @@ export default async function BlogIndexPage() {
   const sortedPosts = getSortedBlogListItems()
 
   return (
-    <main className="mt-24 pb-20">
+    <main className="pb-20">
       <h1 className="text-xl font-semibold">블로그</h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">
         작성한 글 목록입니다.

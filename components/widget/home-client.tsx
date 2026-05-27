@@ -92,7 +92,7 @@ export default function HomeClient({
 }) {
   return (
     <motion.main
-      className="space-y-24"
+      className="space-y-12 pb-18"
       variants={VARIANTS_CONTAINER}
       initial="hidden"
       animate="visible"
@@ -240,7 +240,7 @@ export default function HomeClient({
                           href={job.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:underline dark:text-blue-400"
+                          className="inline-flex items-center gap-1 text-sm text-blue-600 outline-none hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 dark:text-blue-400"
                         >
                           회사 웹사이트 방문
                           <svg

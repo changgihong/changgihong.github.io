@@ -45,7 +45,7 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
   }
 
   return (
-    <main className="mt-24 pb-20">
+    <main className="pb-20">
       <div className="mb-2">
         <Link
           href="/books"

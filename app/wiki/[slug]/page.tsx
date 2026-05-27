@@ -28,7 +28,7 @@ export default async function WikiDetailPage({ params }: WikiDetailPageProps) {
   const backlinks = getBacklinks(post.slugAsParams)
 
   return (
-    <main className="mt-24 pb-20">
+    <main className="pb-20">
       <div className="mb-4">
         <Link
           href="/wiki"

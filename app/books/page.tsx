@@ -14,7 +14,7 @@ export default function BooksPage() {
   const bookList = getBooks()
 
   return (
-    <main className="mt-24 pb-20">
+    <main className="pb-20">
       <h1 className="text-xl font-semibold">Books</h1>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">
         읽은 책과 한줄평을 기록합니다.

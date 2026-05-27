@@ -182,7 +182,8 @@ function MorphingDialogContent({
   useEffect(() => {
     if (isOpen) {
       document.body.classList.add('overflow-hidden')
-      const focusableElements = containerRef.current?.querySelectorAll(
+      const container = containerRef.current
+      const focusableElements = container?.querySelectorAll(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       )
       if (focusableElements && focusableElements.length > 0) {
@@ -190,11 +191,17 @@ function MorphingDialogContent({
         setLastFocusableElement(
           focusableElements[focusableElements.length - 1] as HTMLElement,
         )
-        ;(focusableElements[0] as HTMLElement).focus()
+
+        // 본문 링크가 아닌 닫기 버튼(또는 dialog 컨테이너)에 초점 — 모바일 링크 focus ring 방지
+        const initialFocus =
+          container?.querySelector<HTMLElement>(
+            'button[aria-label="Close dialog"]',
+          ) ?? container
+        initialFocus?.focus({ preventScroll: true })
       }
     } else {
       document.body.classList.remove('overflow-hidden')
-      triggerRef.current?.focus()
+      triggerRef.current?.focus({ preventScroll: true })
     }
   }, [isOpen, triggerRef])
 
@@ -207,8 +214,9 @@ function MorphingDialogContent({
   return (
     <motion.div
       ref={containerRef}
+      tabIndex={-1}
       layoutId={`dialog-${uniqueId}`}
-      className={cn('overflow-hidden', className)}
+      className={cn('overflow-hidden outline-none', className)}
       style={style}
       role="dialog"
       aria-modal="true"
@@ -399,7 +407,10 @@ function MorphingDialogClose({
       type="button"
       aria-label="Close dialog"
       key={`dialog-close-${uniqueId}`}
-      className={cn('absolute top-6 right-6', className)}
+      className={cn(
+        'absolute top-6 right-6 rounded-md outline-none focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-400 dark:focus-visible:ring-zinc-500',
+        className,
+      )}
       initial="initial"
       animate="animate"
       exit="exit"

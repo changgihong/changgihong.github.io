@@ -21,7 +21,7 @@ export default function WikiIndexPage() {
   const tags = getWikiTags()
 
   return (
-    <main className="mt-24 pb-20">
+    <main className="pb-20">
       <div className="flex items-start justify-between gap-4">
         <div>
           <h1 className="text-xl font-semibold">Wiki</h1>
