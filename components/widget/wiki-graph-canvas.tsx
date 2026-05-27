@@ -108,6 +108,7 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
+  const canvasAreaRef = useRef<HTMLDivElement>(null)
 
   // Simulation state lives outside React to avoid triggering re-renders
   const simRef = useRef<Simulation<SimNode, SimLink> | null>(null)
@@ -262,7 +263,6 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
   }, [visibleNodeIds])
 
   const dimsRef = useRef({ w: 0, h: 0 })
-  const [canvasHeight, setCanvasHeight] = useState(0)
 
   // Core draw function — reads all state from refs
   const draw = useCallback(() => {
@@ -477,33 +477,28 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
   // Canvas setup: dimensions, zoom (wheel), pan, drag, hover, click
   useEffect(() => {
     const canvas = canvasRef.current
-    const container = containerRef.current
-    if (!canvas || !container) return
+    const canvasArea = canvasAreaRef.current
+    if (!canvas || !canvasArea) return
 
     const updateDims = () => {
-      const rect = container.getBoundingClientRect()
+      const area = canvasAreaRef.current
+      if (!area) return
+
+      const rect = area.getBoundingClientRect()
       const w = rect.width
-      const footer = document.querySelector('footer')
-      const footerBox = footer?.getBoundingClientRect()
-      const footerReserve =
-        (footerBox?.height ?? 52) +
-        // layout: footer mt-24 — 캔버스 아래에 남겨 둘 여백(패딩은 페이지에서 최소화)
-        96 +
-        4
-      const h = Math.max(320, window.innerHeight - rect.top - footerReserve)
+      const h = rect.height
       const dpr = window.devicePixelRatio || 1
       canvas.width = Math.round(w * dpr)
       canvas.height = Math.round(h * dpr)
       canvas.style.width = `${w}px`
       canvas.style.height = `${h}px`
       dimsRef.current = { w, h }
-      setCanvasHeight(h)
       drawRef.current()
     }
 
     updateDims()
     const ro = new ResizeObserver(updateDims)
-    ro.observe(container)
+    ro.observe(canvasArea)
 
     // Helper: convert client coords → simulation coords
     const toSim = (clientX: number, clientY: number) => {
@@ -700,13 +695,8 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
   return (
     <div ref={containerRef} className="relative -mx-4">
       <div
-        className="relative w-full border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950"
-        style={{
-          height:
-            canvasHeight > 0
-              ? `${canvasHeight}px`
-              : 'min(52dvh, calc(100dvh - 14rem))',
-        }}
+        ref={canvasAreaRef}
+        className="relative h-[min(52dvh,calc(100dvh-14rem))] min-h-80 w-full border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950"
       >
         <canvas ref={canvasRef} className="block" />
 
@@ -786,7 +776,7 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
                   </Button>
                 </div>
               </DialogHeader>
-              <ul className="no-scrollbar mt-1 max-h-[min(50vh,18rem)] flex-1 space-y-0.5 overflow-y-auto overscroll-contain py-1">
+              <ul className="no-scrollbar mt-1 max-h-[min(50dvh,18rem)] flex-1 space-y-0.5 overflow-y-auto overscroll-contain py-1">
                 {tags.map((tag) => {
                   const checked = enabledTagSet.has(tag)
                   const color = tagColorMap.get(tag) ?? '#2563eb'
