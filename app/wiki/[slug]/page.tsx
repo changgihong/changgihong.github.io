@@ -30,12 +30,12 @@ export default async function WikiDetailPage({ params }: WikiDetailPageProps) {
   return (
     <main className="pb-20">
       <div className="mb-4">
-        <Link
+        <a
           href="/wiki"
           className="text-sm text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
           {'<'} Wiki
-        </Link>
+        </a>
       </div>
       <article className="prose prose-gray max-w-none break-words dark:prose-invert prose-h1:text-xl prose-h1:font-medium prose-h2:mt-12 prose-h2:text-lg prose-h2:font-medium prose-h3:text-base prose-h3:font-medium prose-pre:border prose-pre:border-zinc-200 prose-pre:bg-zinc-100 prose-pre:text-zinc-800 dark:prose-pre:border-zinc-800 dark:prose-pre:bg-zinc-900 dark:prose-pre:text-zinc-100">
         <h1>{post.title}</h1>

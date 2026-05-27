@@ -28,7 +28,7 @@
   }
   html {
     @apply font-sans;
-    overflow-anchor: none;
+    scroll-padding-top: 5rem;
   }
 }
 

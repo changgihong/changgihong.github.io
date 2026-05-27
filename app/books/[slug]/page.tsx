@@ -47,12 +47,12 @@ export default async function BookDetailPage({ params }: BookDetailPageProps) {
   return (
     <main className="pb-20">
       <div className="mb-2">
-        <Link
+        <a
           href="/books"
           className="text-sm text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
           {'<'} Books
-        </Link>
+        </a>
       </div>
       <header className="mb-8 border-b border-zinc-200 pb-6 dark:border-zinc-800">
         <h1 className="text-xl font-semibold">{book.title}</h1>
