@@ -82,7 +82,7 @@ export default function RootLayout({
         >
           <ScrollOnNavigate />
           <div className="flex min-h-svh w-full flex-col font-(family-name:--font-pretendard)">
-            <div className="relative mx-auto flex min-h-0 w-full max-w-screen-sm flex-1 flex-col px-4 pt-20">
+            <div className="relative mx-auto flex min-h-0 w-full max-w-screen-sm flex-1 flex-col overflow-x-hidden px-4 pt-20">
               <Header />
               <LayoutContent>{children}</LayoutContent>
               <Footer className="mt-auto shrink-0" />

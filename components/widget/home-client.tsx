@@ -296,7 +296,7 @@ export default function HomeClient({
             {blogPosts.map((post) => (
               <Link
                 key={post.link}
-                className="-mx-3 rounded-xl px-3 py-3"
+                className="-mx-3 max-w-full min-w-0 rounded-xl px-3 py-3 break-words"
                 href={post.link}
                 data-id={post.link}
               >
@@ -343,7 +343,7 @@ export default function HomeClient({
               return (
                 <Link
                   key={book.slug}
-                  className="-mx-3 rounded-xl px-3 py-3"
+                  className="-mx-3 max-w-full min-w-0 rounded-xl px-3 py-3 break-words"
                   href={link}
                   data-id={book.slug}
                 >
@@ -396,7 +396,7 @@ export default function HomeClient({
             {recentWikiPosts.map((post) => (
               <Link
                 key={post.slug}
-                className="-mx-3 rounded-xl px-3 py-3"
+                className="-mx-3 max-w-full min-w-0 rounded-xl px-3 py-3 break-words"
                 href={`/wiki/${post.slug}`}
                 data-id={post.slug}
               >

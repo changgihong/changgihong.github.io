@@ -31,6 +31,13 @@
   }
 }
 
+@layer components {
+  .prose :where(a):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
 :root {
   /* sugar-high tokens: tuned light mapping */
   --sh-class: #df8e1d;

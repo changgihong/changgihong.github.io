@@ -32,7 +32,7 @@ export default async function BlogIndexPage() {
           {sortedPosts.map((post) => (
             <Link
               key={post.link}
-              className="-mx-3 rounded-xl px-3 py-3 no-underline hover:no-underline"
+              className="-mx-3 max-w-full min-w-0 rounded-xl px-3 py-3 break-words no-underline hover:no-underline"
               href={post.link}
               data-id={post.link}
             >

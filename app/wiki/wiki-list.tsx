@@ -75,7 +75,7 @@ export function WikiList({ posts, tags }: WikiListProps) {
           {filteredPosts.map((post) => (
             <Link
               key={post.slug}
-              className="-mx-3 rounded-xl px-3 py-3 no-underline hover:no-underline"
+              className="-mx-3 max-w-full min-w-0 rounded-xl px-3 py-3 break-words no-underline hover:no-underline"
               href={`/wiki/${post.slug}`}
               data-id={post.slug}
             >

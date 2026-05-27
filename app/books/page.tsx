@@ -34,7 +34,7 @@ export default function BooksPage() {
             return (
               <Link
                 key={book.slug}
-                className="-mx-3 rounded-xl px-3 py-3 no-underline hover:no-underline"
+                className="-mx-3 max-w-full min-w-0 rounded-xl px-3 py-3 break-words no-underline hover:no-underline"
                 href={link}
                 data-id={link}
               >

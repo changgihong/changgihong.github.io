@@ -75,7 +75,10 @@ export function AnimatedBackground({
         child,
         {
           key: id,
-          className: cn('relative inline-flex', child.props.className),
+          className: cn(
+            'relative flex w-full max-w-full min-w-0',
+            child.props.className,
+          ),
           'data-checked': activeId === id ? 'true' : 'false',
           ...interactionProps,
         },
@@ -96,7 +99,7 @@ export function AnimatedBackground({
               />
             )}
           </AnimatePresence>
-          <div className="z-10">{child.props.children}</div>
+          <div className="z-10 w-full min-w-0">{child.props.children}</div>
         </>,
       )
     },
