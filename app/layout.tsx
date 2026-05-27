@@ -9,6 +9,7 @@ import { ThemeProvider } from 'next-themes'
 import localFont from 'next/font/local'
 import { Footer } from '../components/layout/footer'
 import { Header } from '../components/layout/header'
+import { LayoutContent } from '../components/layout/layout-content'
 import { ScrollOnNavigate } from '../components/layout/scroll-on-navigate'
 import './globals.css'
 import { Geist } from "next/font/google";
@@ -81,10 +82,10 @@ export default function RootLayout({
         >
           <ScrollOnNavigate />
           <div className="flex min-h-svh w-full flex-col font-(family-name:--font-pretendard)">
-            <div className="relative mx-auto flex w-full max-w-screen-sm flex-1 flex-col px-4 pt-20">
+            <div className="relative mx-auto flex min-h-0 w-full max-w-screen-sm flex-1 flex-col px-4 pt-20">
               <Header />
-              {children}
-              <Footer className="mt-auto" />
+              <LayoutContent>{children}</LayoutContent>
+              <Footer className="mt-auto shrink-0" />
             </div>
           </div>
         </ThemeProvider>

@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 
 function scrollToTop() {
   window.scrollTo(0, 0)
@@ -9,39 +9,36 @@ function scrollToTop() {
   document.body.scrollTop = 0
 }
 
-/** 모바일에서 dvh가 커진 뒤 SPA 이동 시 문서 높이가 줄지 않는 현상 완화 */
+/** 모바일에서 SPA 이동 후 scrollHeight가 줄지 않는 현상 완화 */
 function refreshViewportLayout() {
   window.dispatchEvent(new Event('resize'))
   if (window.visualViewport) {
     window.visualViewport.dispatchEvent(new Event('resize'))
   }
+
+  const html = document.documentElement
+  const body = document.body
+  html.style.height = 'auto'
+  body.style.height = 'auto'
+  void html.offsetHeight
+  html.style.height = ''
+  body.style.height = ''
+}
+
+function resetPageScrollAndLayout() {
+  scrollToTop()
+  refreshViewportLayout()
 }
 
 export function ScrollOnNavigate() {
   const pathname = usePathname()
-  const isPopStateRef = useRef(false)
 
   useEffect(() => {
-    const onPopState = () => {
-      isPopStateRef.current = true
-    }
+    resetPageScrollAndLayout()
+    requestAnimationFrame(resetPageScrollAndLayout)
+    const timeoutId = window.setTimeout(resetPageScrollAndLayout, 0)
 
-    window.addEventListener('popstate', onPopState)
-    return () => window.removeEventListener('popstate', onPopState)
-  }, [])
-
-  useEffect(() => {
-    if (isPopStateRef.current) {
-      isPopStateRef.current = false
-      return
-    }
-
-    scrollToTop()
-    refreshViewportLayout()
-    requestAnimationFrame(() => {
-      scrollToTop()
-      refreshViewportLayout()
-    })
+    return () => window.clearTimeout(timeoutId)
   }, [pathname])
 
   return null
