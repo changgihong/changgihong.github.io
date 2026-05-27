@@ -9,6 +9,14 @@ function scrollToTop() {
   document.body.scrollTop = 0
 }
 
+/** 모바일에서 dvh가 커진 뒤 SPA 이동 시 문서 높이가 줄지 않는 현상 완화 */
+function refreshViewportLayout() {
+  window.dispatchEvent(new Event('resize'))
+  if (window.visualViewport) {
+    window.visualViewport.dispatchEvent(new Event('resize'))
+  }
+}
+
 export function ScrollOnNavigate() {
   const pathname = usePathname()
   const isPopStateRef = useRef(false)
@@ -29,7 +37,11 @@ export function ScrollOnNavigate() {
     }
 
     scrollToTop()
-    requestAnimationFrame(scrollToTop)
+    refreshViewportLayout()
+    requestAnimationFrame(() => {
+      scrollToTop()
+      refreshViewportLayout()
+    })
   }, [pathname])
 
   return null

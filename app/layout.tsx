@@ -80,11 +80,11 @@ export default function RootLayout({
           defaultTheme="system"
         >
           <ScrollOnNavigate />
-          <div className="flex min-h-dvh w-full flex-col font-(family-name:--font-pretendard)">
+          <div className="flex min-h-svh w-full flex-col font-(family-name:--font-pretendard)">
             <div className="relative mx-auto flex w-full max-w-screen-sm flex-1 flex-col px-4 pt-20">
               <Header />
-              <div className="flex-1">{children}</div>
-              <Footer />
+              {children}
+              <Footer className="mt-auto shrink-0" />
             </div>
           </div>
         </ThemeProvider>
