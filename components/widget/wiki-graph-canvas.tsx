@@ -696,7 +696,7 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
     <div ref={containerRef} className="relative -mx-4">
       <div
         ref={canvasAreaRef}
-        className="relative h-[min(52dvh,calc(100dvh-14rem))] min-h-80 w-full border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950"
+        className="relative h-[clamp(20rem,50svh,36rem)] w-full border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950"
       >
         <canvas ref={canvasRef} className="block" />
 
@@ -720,7 +720,7 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
               <ComboboxEmpty className="text-xs">
                 일치하는 문서가 없습니다
               </ComboboxEmpty>
-              <ComboboxList className="max-h-[min(40dvh,12rem)]">
+              <ComboboxList className="max-h-48">
                 {(doc: WikiSearchItem) => (
                   <ComboboxItem key={doc.id} value={doc}>
                     <span className="min-w-0 flex-1 truncate">{doc.label}</span>
@@ -747,7 +747,7 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
                 <Tags className="size-4 text-zinc-600 dark:text-zinc-300" />
               </Button>
             </DialogTrigger>
-            <DialogContent className="flex max-h-[min(85dvh,28rem)] flex-col gap-0 sm:max-w-sm">
+            <DialogContent className="flex max-h-[28rem] flex-col gap-0 sm:max-w-sm">
               <DialogHeader className="shrink-0 space-y-3 text-left">
                 <div className="pr-8">
                   <DialogTitle>태그 필터</DialogTitle>
@@ -776,7 +776,7 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
                   </Button>
                 </div>
               </DialogHeader>
-              <ul className="no-scrollbar mt-1 max-h-[min(50dvh,18rem)] flex-1 space-y-0.5 overflow-y-auto overscroll-contain py-1">
+              <ul className="no-scrollbar mt-1 max-h-72 flex-1 space-y-0.5 overflow-y-auto overscroll-contain py-1">
                 {tags.map((tag) => {
                   const checked = enabledTagSet.has(tag)
                   const color = tagColorMap.get(tag) ?? '#2563eb'
