@@ -1,6 +1,7 @@
 import { getWikiPosts, getWikiTags } from '@/lib/wiki-posts'
-import Link from 'next/link'
+import { getGraph } from '@/lib/wiki-graph'
 import { WikiList } from './wiki-list'
+import { WikiGraphDialog } from './graph-dialog'
 
 export const metadata = {
   title: 'Wiki',
@@ -19,6 +20,7 @@ export default function WikiIndexPage() {
     updatedAt: post.updatedAt,
   }))
   const tags = getWikiTags()
+  const graph = getGraph()
 
   return (
     <main className="pb-20">
@@ -29,12 +31,7 @@ export default function WikiIndexPage() {
             학습 기록을 연결형 노트로 정리한 문서 목록입니다.
           </p>
         </div>
-        <Link
-          href="/wiki/graph"
-          className="shrink-0 rounded-full border border-zinc-300 px-3 py-1.5 text-xs text-zinc-600 transition-colors hover:border-zinc-400 dark:border-zinc-700 dark:text-zinc-300 dark:hover:border-zinc-500"
-        >
-          Graph 보기
-        </Link>
+        <WikiGraphDialog graph={graph} />
       </div>
       <WikiList posts={posts} tags={tags} />
     </main>

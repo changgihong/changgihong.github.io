@@ -95,9 +95,14 @@ function easeInOut(t: number): number {
 
 type WikiGraphCanvasProps = {
   graph: WikiGraph
+  variant?: 'page' | 'dialog'
 }
 
-export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
+export function WikiGraphCanvas({
+  graph,
+  variant = 'page',
+}: WikiGraphCanvasProps) {
+  const isDialog = variant === 'dialog'
   const router = useRouter()
   const { resolvedTheme } = useTheme()
   const [themeMounted, setThemeMounted] = useState(false)
@@ -693,10 +698,17 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
   }, [])
 
   return (
-    <div ref={containerRef} className="relative -mx-4">
+    <div
+      ref={containerRef}
+      className={isDialog ? 'relative' : 'relative -mx-4'}
+    >
       <div
         ref={canvasAreaRef}
-        className="relative h-[clamp(20rem,50svh,36rem)] w-full border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950"
+        className={
+          isDialog
+            ? 'relative h-[min(80vh,40rem)] w-full bg-zinc-50 dark:bg-zinc-950'
+            : 'relative h-[clamp(20rem,50svh,36rem)] w-full border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950'
+        }
       >
         <canvas ref={canvasRef} className="block" />
 
@@ -822,12 +834,14 @@ export function WikiGraphCanvas({ graph }: WikiGraphCanvasProps) {
               {searchMessage}
             </div>
           )}
-          <Link
-            href="/wiki"
-            className="rounded-full border border-zinc-300 bg-white/90 px-3 py-1.5 text-xs text-zinc-600 backdrop-blur transition-colors hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/85 dark:text-zinc-300 dark:hover:border-zinc-500"
-          >
-            문서 리스트로 보기
-          </Link>
+          {!isDialog && (
+            <Link
+              href="/wiki"
+              className="rounded-full border border-zinc-300 bg-white/90 px-3 py-1.5 text-xs text-zinc-600 backdrop-blur transition-colors hover:border-zinc-400 dark:border-zinc-700 dark:bg-zinc-900/85 dark:text-zinc-300 dark:hover:border-zinc-500"
+            >
+              문서 리스트로 보기
+            </Link>
+          )}
         </div>
       </div>
     </div>
