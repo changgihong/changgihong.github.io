@@ -489,9 +489,11 @@ export function WikiGraphCanvas({
       const area = canvasAreaRef.current
       if (!area) return
 
-      const rect = area.getBoundingClientRect()
-      const w = rect.width
-      const h = rect.height
+      // offsetWidth/Height returns the untransformed layout size. getBoundingClientRect
+      // would return the transform-scaled size, which is wrong while the dialog's morph
+      // animation (CSS transform) is in flight — that left the canvas stuck tiny.
+      const w = area.offsetWidth
+      const h = area.offsetHeight
       const dpr = window.devicePixelRatio || 1
       canvas.width = Math.round(w * dpr)
       canvas.height = Math.round(h * dpr)
@@ -710,7 +712,7 @@ export function WikiGraphCanvas({
             : 'relative h-[clamp(20rem,50svh,36rem)] w-full border-y border-zinc-200 bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-950'
         }
       >
-        <canvas ref={canvasRef} className="block" />
+        <canvas ref={canvasRef} className="block touch-none select-none" />
 
         <div className="absolute top-3 left-1/2 z-10 w-[min(92vw,15.5rem)] -translate-x-1/2">
           <Combobox
