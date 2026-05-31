@@ -24,13 +24,10 @@ import {
 } from '@/components/ui/combobox'
 import { Button } from '@/components/ui/button'
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog'
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import { Tags } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -177,6 +174,7 @@ export function WikiGraphCanvas({
   const enabledTagSet = useMemo(() => new Set(enabledTags), [enabledTags])
 
   const [searchMessage, setSearchMessage] = useState('')
+  const [tagFilterOpen, setTagFilterOpen] = useState(false)
 
   const wikiSearchItems = useMemo((): WikiSearchItem[] => {
     return nodes
@@ -714,43 +712,48 @@ export function WikiGraphCanvas({
       >
         <canvas ref={canvasRef} className="block touch-none select-none" />
 
-        <div className="absolute top-3 left-1/2 z-10 w-[min(92vw,15.5rem)] -translate-x-1/2">
-          <Combobox
-            items={wikiSearchItems}
-            filter={wikiFilter}
-            itemToStringLabel={(doc) => doc.label}
-            isItemEqualToValue={(a, b) => a.id === b.id}
-            onValueChange={(doc) => focusWikiFromPick(doc)}
-            autoHighlight
-          >
-            <ComboboxInput
-              aria-label="Wiki graph 문서 검색"
-              placeholder="문서 검색…"
-              showTrigger
-              showClear
-              className="h-7 w-full min-w-0 rounded-full border-zinc-300/90 bg-white/92 text-xs shadow-sm backdrop-blur-md dark:border-zinc-700/90 dark:bg-zinc-900/88 [&_input]:placeholder:text-zinc-400 dark:[&_input]:placeholder:text-zinc-500"
-            />
-            <ComboboxContent className="rounded-xl border-zinc-200/90 dark:border-zinc-800/90">
-              <ComboboxEmpty className="text-xs">
-                일치하는 문서가 없습니다
-              </ComboboxEmpty>
-              <ComboboxList className="max-h-48">
-                {(doc: WikiSearchItem) => (
-                  <ComboboxItem key={doc.id} value={doc}>
-                    <span className="min-w-0 flex-1 truncate">{doc.label}</span>
-                    <span className="text-muted-foreground max-w-[40%] shrink-0 truncate text-[10px]">
-                      {doc.slug}
-                    </span>
-                  </ComboboxItem>
-                )}
-              </ComboboxList>
-            </ComboboxContent>
-          </Combobox>
-        </div>
+        <div className="absolute right-4 bottom-4 z-10 flex items-end gap-2">
+          <div className="w-[min(60vw,15.5rem)]">
+            <Combobox
+              items={wikiSearchItems}
+              filter={wikiFilter}
+              itemToStringLabel={(doc) => doc.label}
+              isItemEqualToValue={(a, b) => a.id === b.id}
+              onValueChange={(doc) => focusWikiFromPick(doc)}
+              autoHighlight
+            >
+              <ComboboxInput
+                aria-label="Wiki graph 문서 검색"
+                placeholder="문서 검색…"
+                showTrigger
+                showClear
+                className="h-7 w-full min-w-0 rounded-full border-zinc-300/90 bg-white/92 text-xs shadow-sm backdrop-blur-md dark:border-zinc-700/90 dark:bg-zinc-900/88 [&_input]:placeholder:text-zinc-400 dark:[&_input]:placeholder:text-zinc-500"
+              />
+              <ComboboxContent
+                side="top"
+                className="rounded-xl border-zinc-200/90 dark:border-zinc-800/90"
+              >
+                <ComboboxEmpty className="text-xs">
+                  일치하는 문서가 없습니다
+                </ComboboxEmpty>
+                <ComboboxList className="max-h-48">
+                  {(doc: WikiSearchItem) => (
+                    <ComboboxItem key={doc.id} value={doc}>
+                      <span className="min-w-0 flex-1 truncate">
+                        {doc.label}
+                      </span>
+                      <span className="text-muted-foreground max-w-[40%] shrink-0 truncate text-[10px]">
+                        {doc.slug}
+                      </span>
+                    </ComboboxItem>
+                  )}
+                </ComboboxList>
+              </ComboboxContent>
+            </Combobox>
+          </div>
 
-        <div className="absolute right-4 bottom-4 z-10">
-          <Dialog>
-            <DialogTrigger asChild>
+          <Popover open={tagFilterOpen} onOpenChange={setTagFilterOpen}>
+            <PopoverTrigger asChild>
               <Button
                 type="button"
                 variant="outline"
@@ -760,16 +763,30 @@ export function WikiGraphCanvas({
               >
                 <Tags className="size-4 text-zinc-600 dark:text-zinc-300" />
               </Button>
-            </DialogTrigger>
-            <DialogContent className="flex max-h-[28rem] flex-col gap-0 sm:max-w-sm">
-              <DialogHeader className="shrink-0 space-y-3 text-left">
-                <div className="pr-8">
-                  <DialogTitle>태그 필터</DialogTitle>
-                  <DialogDescription>
+            </PopoverTrigger>
+            <PopoverContent
+              side="top"
+              align="end"
+              className="flex max-h-[28rem] w-[min(80vw,18rem)] flex-col gap-0"
+              onKeyDown={(e) => {
+                // Close only the popover on Escape; stop it from bubbling to the
+                // parent GraphDialog's document-level Escape handler.
+                if (e.key === 'Escape') {
+                  e.stopPropagation()
+                  setTagFilterOpen(false)
+                }
+              }}
+            >
+              <div className="shrink-0 space-y-3 text-left">
+                <div>
+                  <p className="font-heading text-base leading-none font-medium">
+                    태그 필터
+                  </p>
+                  <p className="text-muted-foreground mt-2 text-sm">
                     그래프에 표시할 문서 태그를 선택합니다.
-                  </DialogDescription>
+                  </p>
                 </div>
-                <div className="flex flex-wrap gap-1.5 pr-8">
+                <div className="flex flex-wrap gap-1.5">
                   <Button
                     type="button"
                     variant="outline"
@@ -789,7 +806,7 @@ export function WikiGraphCanvas({
                     해제
                   </Button>
                 </div>
-              </DialogHeader>
+              </div>
               <ul className="no-scrollbar mt-1 max-h-72 flex-1 space-y-0.5 overflow-y-auto overscroll-contain py-1">
                 {tags.map((tag) => {
                   const checked = enabledTagSet.has(tag)
@@ -821,8 +838,8 @@ export function WikiGraphCanvas({
                   )
                 })}
               </ul>
-            </DialogContent>
-          </Dialog>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {/* Bottom-left controls */}
