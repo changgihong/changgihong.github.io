@@ -731,6 +731,7 @@ export function WikiGraphCanvas({
               />
               <ComboboxContent
                 side="top"
+                container={isDialog ? containerRef : undefined}
                 className="rounded-xl border-zinc-200/90 dark:border-zinc-800/90"
               >
                 <ComboboxEmpty className="text-xs">
