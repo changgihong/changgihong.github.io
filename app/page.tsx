@@ -2,6 +2,7 @@ import HomeClient from '@/components/widget/home-client'
 import { getSortedBlogListItems } from '@/lib/blog'
 import { getBooks } from '@/lib/books'
 import { getWikiPosts } from '@/lib/wiki-posts'
+import { getGraph } from '@/lib/wiki-graph'
 
 export default function HomePage() {
   const blogPosts = getSortedBlogListItems()
@@ -22,11 +23,14 @@ export default function HomePage() {
       updatedAt: post.updatedAt,
     }))
 
+  const graph = getGraph()
+
   return (
     <HomeClient
       blogPosts={blogPosts}
       recentBooks={recentBooks}
       recentWikiPosts={recentWikiPosts}
+      graph={graph}
     />
   )
 }

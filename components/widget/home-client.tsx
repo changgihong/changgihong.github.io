@@ -13,7 +13,9 @@ import {
   MorphingDialogClose,
 } from '@/components/ui/morphing-dialog'
 import { Spotlight } from '@/components/ui/spotlight'
+import { WikiGraphDialog } from '@/app/wiki/graph-dialog'
 import type { BlogListItem } from '@/lib/blog'
+import type { WikiGraph } from '@/lib/wiki-graph'
 import { formatTotalWorkExperience } from '@/lib/work-experience'
 import { formatWikiDate } from '@/lib/wiki-date'
 import { motion } from 'motion/react'
@@ -77,6 +79,7 @@ export default function HomeClient({
   blogPosts,
   recentBooks,
   recentWikiPosts,
+  graph,
 }: {
   blogPosts: BlogListItem[]
   recentBooks: {
@@ -90,6 +93,7 @@ export default function HomeClient({
     title: string
     updatedAt: string
   }[]
+  graph: WikiGraph
 }) {
   return (
     <motion.main
@@ -375,12 +379,7 @@ export default function HomeClient({
         <div className="mb-3 flex items-center justify-between gap-4">
           <h3 className="text-lg font-medium dark:text-zinc-100">Wiki</h3>
           <div className="flex items-center gap-4">
-            <Link
-              href="/wiki/graph"
-              className="text-sm text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
-            >
-              View graph →
-            </Link>
+            <WikiGraphDialog graph={graph} variant="link" />
             <Link
               href="/wiki"
               className="text-sm text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
