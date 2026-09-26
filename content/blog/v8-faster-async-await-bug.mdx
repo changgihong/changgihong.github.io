@@ -1,122 +1,82 @@
 ---
-title: "V8 블로그 글에서 찾은 에러(진)"
-description: "작년 하반기에 우연히 찾은 공신력 높은 글의 에러(진)에 대해 작성해보았습니다."
-date: "2024-02-15"
+title: 'async/await 실행 순서가 Node.js 버전마다 달랐던 이유'
+description: 'V8 블로그의 예제를 버전별로 실행하고, 관찰한 결과와 JavaScript 명세 변경의 관계를 확인한 기록입니다.'
+date: '2024-02-15'
+updatedAt: '2026-09-26'
+revisions:
+  - '후속 답변을 반영해 당시 명세와 이후 명세 변경을 구분하고, 원문이 틀렸다는 단정을 수정했습니다.'
+  - '두 then 콜백이 처음부터 함께 큐에 들어간다는 설명을 바로잡고, async 함수의 실행 재개와 마이크로태스크 처리 흐름을 다시 정리했습니다.'
 ---
-## 서론
 
-나는 작년 하반기에 데브코스라는 부트캠프를 하나 수료했다. 한창 JavaScript에 대해 심도있게 파고드는 공부를 하던 시기가 있었는데, 내가 JS에서 가장 높은 관심을 갖던 비동기, Promise, 그리고 async / await 문법에 대해 구글에서 많은 자료를 찾아보던 와중에 어떤 글을 하나 찾게 되었다.
+## 같은 예제에서 다른 결과를 발견하다
 
-[Faster async functions and promises](https://v8.dev/blog/fast-async)
+2023년 JavaScript의 Promise와 async/await를 공부하며 발표를 준비하던 중, V8 블로그의 [Faster async functions and promises](https://v8.dev/blog/fast-async)를 읽었다. 2018년에 작성된 이 글은 async 함수의 최적화 과정과 실행 순서를 다룬다.
 
-V8 (JS 엔진)에서 Promise와 async 함수의 실행을 어떻게 최적화할 수 있었는지 다루는 블로그 글이다. 어려워서 다 읽지는 못했지만 Promise와 async / await 문법의 실행을 호출 스택, 이벤트 루프와 태스크 큐의 관점에서 심도있게 다루는 내용을 다루고 있다.
-
-한창 이 주제에 대해 딥다이브(데브코스에서 진행했던 자발적 발표 활동)를 준비하던 와중이어서 재미있게 읽어내려가던 와중에 어느 한 섹션에서 멈칫하게 되었다.
-
-```js
-const p = Promise.resolve();
-
-(async () => {
-  await p; console.log('after:await');
-})();
-
-p.then(() => console.log('tick:a'))
- .then(() => console.log('tick:b'));
-```
-
-이 코드 예제의 결과를 예상해보라고 해서 예상해봤다. 아래와 같이 나올것이라 예상했다.
-
-```bash
-after: await
-tick: a
-tick: b
-```
-
-그런데 블로그 글은 Node.js 8 버전에서는 이런 결과가 나오는데, 10 버전에서는 아래와 같이 나온다고 말한다.
-
-```bash
-tick: a
-tick: b
-after: await
-```
-
-그리고 10 버전의 결과가 맞다고 한다. 혼란스러울 수 있지만 이게 "Correct Behavior"라고 한다.
-
-뭐지? 충격먹어서 바로 터미널 켜서 위 예제를 실행해봤다. 내가 예상한 결과와 똑같이 나온다. (Node.js 20버전이었다.)
-나는 바로 이건 뭔가 오류가 있을 수도 있겠다는 생각을 했고, 내가 잘못 알고 있는 상황이라고 해도 얻어갈 것이 많다고 생각했다.
-
-그래서 바로 파보았다.
-
-## 본론
-
-일단 블로그 글에서 나온 것 처럼 Node.js 8버전에서는 `after: await`이 먼저 출력됐고, 10버전과 11버전에서는 `tick: a`가 먼저 출력됐다. 그리고 12버전 이후로는 다시 `after: await`이 먼저 출력됐다.
-
-크롬 브라우저 콘솔에도 테스트해봤는데, 역시나 `after: await`이 먼저 출력됐다. 내가 틀리지 않았다는 생각이 들었다.
-
-일단 내가 위 코드의 실행 흐름을 분석한 것은 다음과 같다.
+다음 예제에서 설명과 실제 실행 결과가 달라 의문이 생겼다.
 
 ```js
 const p = Promise.resolve()
+
+;(async () => {
+  await p
+  console.log('after: await')
+})()
+
+p.then(() => console.log('tick: a')).then(() => console.log('tick: b'))
 ```
 
-상수 p에는 resolve된 Promise가 담겼을 것이다.
+당시 사용하던 Node.js 20에서는 다음 순서로 출력됐다.
 
-그리고 바로 아래에 등장하는 즉시실행함수(IIFE, Immediately Invoked Function Expression)가 실행되었을 것이고, IIFE는 익명의 async function을 동작시켰을 것이다.
-
-```js
-(async () => {
-  await p; console.log('after:await');
-})();
-```
-
-여기서 resolve된 Promise인 p는 `await`키워드를 만난다. 이때 어떤 일이 벌어질까?
-
-[MDN에 따르면](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#control_flow_effects_of_await), 일단 p가 resolve된 Promise든 아니든 그 즉시 async function의 실행을 중단하고 나머지 실행하지 못한 작업들을 마이크로 태스트 큐에 푸시한다고 한다.
-
-그러면 `console.log('after: await');`는 마이크로 태스크 큐에 push되었을 것이다.
-
-그리고 async function의 실행이 중단되었으니, 그 아래 코드가 실행되었을 것이다.
-
-```js
-p.then(() => console.log('tick:a'))
- .then(() => console.log('tick:b'));
-```
-
-p는 resolve된 Promise이니까, then()이 호출되었을 것이고, 내부의 콜백은 마이크로 태스크 큐로 푸시되었을 것이다.
-
-그러면 지금 아래와 같은 순서로 MicroTask가 푸시되어 있을 것이다.
-
-1. `console.log('after: await')`
-2. `() => console.log('tick: a')`
-3. `() => console.log('tick: b')`
-
-아래에 코드가 더 없으므로, 중단되었던 async function의 실행이 재개될 것이다.
-
-그런데 MDN에 따르면, 이 async function 내부에서 push된 MicroTask는 async function의 실행 재개 이전에 실행될 수 있다고 한다. (위 링크에서 queueMicroTask로 검색하면 관련 내용을 찾을 수 있다.)
-
-그러면 `console.log('after: await')`이 실행되고, async function의 실행이 재개되고 끝나서 IIFE의 실행도 끝나면 호출 스택이 비어서 나머지 MicroTask가 실행되는 것이고, 그렇게 이 코드 예제의 실행이 끝나게 되는 것이다.
-
-그래서 내가 생각하는 코드 예제의 실행 결과는 아래가 맞다고 생각한다.
-
-```bash
+```text
 after: await
 tick: a
 tick: b
 ```
 
-## 결론
+원문은 Node.js 8의 위 결과를 당시 명세에 맞지 않는 동작으로 설명하고, Node.js 10의 다음 결과를 올바른 동작으로 소개했다.
 
-일단 왜 제목에 에러(진)이라고 해놨냐면, 원래 이 글의 저자인 @MayaLekova, @bmeurer 두 분 또는 다른 JS 사용자의 검증을 받지 못했기 때문이다.
+```text
+tick: a
+tick: b
+after: await
+```
 
-<img
-  width='616'
-  alt='X.com_faster-async-reply'
-  src='https://github.com/sscoderati/sscoderati.github.io/assets/69716992/3d43783f-4f77-404d-b12f-e6738603b785'
-  style={{ margin: '0 auto' }}
-/>
+처음에는 문서의 오류라고 생각했다. 그러나 실행 결과만으로 문서가 작성될 당시의 명세까지 판단할 수는 없었다.
 
-나는 이 에러를 발견했을 때 진짜로 나름 피드백을 받고 싶어서 무작정 트위터로 달려가 V8 계정에서 이 포스트에 관한 트윗의 답글로 나의 의견을 정리해서 달아두었었다. 하지만 조회수만 오르고 답글은 달리지 않았다... 🥹
+## 버전별 실행 결과와 그 의미
 
-그래서 뭐 한동안 잊고 지내다가 다시 이 내용에 대한 글을 써야겠다고 마음먹었을 때, 먼저 v8.dev 레포지토리에 이슈를 생성해서 내 생각을 정리해두고, 현재는 반응을 기다리고 있다. [깃헙 이슈 링크](https://github.com/v8/v8.dev/issues/735)
+당시 Node.js 8, 10, 11, 12, 18, 20에서 예제를 실행하고, Chrome 콘솔에서도 결과를 확인했다. [문의 이슈](https://github.com/v8/v8.dev/issues/735)에 기록한 결과는 다음과 같다.
 
-혹시나 이 글을 읽어주시는 독자 분께서도 혹시 심심하시면 검증을 부탁드리고 싶다. 이런 글에 대한 피드백은 너무 감사하다.
+| Node.js 버전 | 출력 순서                        |
+| ------------ | -------------------------------- |
+| 8            | after: await → tick: a → tick: b |
+| 10·11        | tick: a → tick: b → after: await |
+| 12·18·20     | after: await → tick: a → tick: b |
+
+이 표는 2024년 조사 당시의 관찰 기록이다. 원인은 이후 받은 [유지보수자의 답변](https://github.com/v8/v8.dev/issues/735#issuecomment-1950965053)을 통해 확인했다.
+
+- Node.js 8까지의 동작은 당시 JavaScript 명세에 맞지 않았다.
+- Node.js 10에서는 당시 명세를 따르도록 수정해 실행 순서가 달라졌다.
+- 동시에 V8 팀이 명세 변경을 제안했고, 이 제안이 받아들여지면서 Node.js 12에서는 이전과 같은 출력 순서가 다시 올바른 동작이 됐다.
+
+즉, Node.js 8과 12에서 같은 결과가 나왔어도 명세와의 관계는 달랐다. 원문의 설명을 이해하려면 작성 시점과 명세 변경의 맥락을 함께 봐야 했다.
+
+## 네이티브 Promise 예제의 실행 흐름
+
+현재 동작을 이해할 때는 `await` 이후의 실행 재개와 Promise 체이닝을 구분해야 한다. 다음 설명은 위 예제처럼 이미 이행된 네이티브 Promise를 사용하는 경우를 다룬다.
+
+1. `p`는 이미 이행된 Promise다. async 함수가 `await p`를 만나면 함수의 실행을 중단하고, 이후 실행을 재개할 작업을 예약한다. 이미 이행된 값이어도 `await` 다음 문장이 즉시 실행되지는 않는다.
+2. 호출한 쪽의 동기 코드가 계속 실행된다. 첫 번째 `p.then(...)`은 `tick: a`를 출력할 콜백을 예약하고, 새로운 Promise를 반환한다.
+3. 두 번째 `.then(...)`은 그 새로운 Promise에 연결된다. 이 Promise는 아직 대기 상태이므로, `tick: b` 콜백은 이 시점에 실행 가능한 작업으로 큐에 들어가지 않는다.
+4. 동기 코드가 끝나면 먼저 예약된 async 함수의 실행 재개 작업이 처리되어 `after: await`이 출력된다.
+5. 첫 번째 `.then()` 콜백이 실행되어 `tick: a`를 출력한다. 반환된 Promise가 이행되면서 두 번째 콜백이 예약되고, 이후 `tick: b`가 출력된다.
+
+따라서 세 출력이 처음부터 한꺼번에 큐에 들어간다고 설명하면 Promise 체이닝의 동작을 놓치게 된다. async 함수가 호출 스택에 즉시 복귀한 뒤 나머지 마이크로태스크를 처리하는 것처럼 설명하는 것도 정확하지 않다. 실행 재개 자체가 마이크로태스크 처리 과정에서 일어난다.
+
+이 흐름은 [MDN의 await 설명](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await#control_flow_effects_of_await)과 [then의 반환값 및 체이닝 설명](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/then)을 함께 참고했다.
+
+## 관찰과 원인 설명을 구분하기
+
+이번 조사에서 얻은 교훈은 실행 결과가 같아도 그 이유까지 같다고 볼 수 없다는 것이다. 오래된 기술 자료를 읽을 때는 실행 환경뿐 아니라 명세의 적용 시점도 확인해야 한다.
+
+의문을 재현 가능한 예제로 정리해 질문한 덕분에, 단순한 출력 순서 비교에서 명세 변경의 배경까지 이해할 수 있었다. 이 문의를 바탕으로 원문에 안내를 추가한 과정은 [V8 블로그의 async/await 설명을 보완한 과정](/blog/googler-replied-about-await-bug)에 이어서 정리했다.

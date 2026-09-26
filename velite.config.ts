@@ -1,4 +1,10 @@
-import { defineCollection, defineConfig, s } from 'velite'
+import {
+  defineCollection,
+  defineConfig,
+  type MarkdownOptions,
+  type MdxOptions,
+  s,
+} from 'velite'
 import { normalizeWikiSlug } from './lib/wiki-slug'
 
 type RemarkNode = {
@@ -41,9 +47,7 @@ const NON_TRAVERSABLE_NODES = new Set([
 ])
 
 const extractWikiLinksFromRaw = (raw: string): string[] => {
-  const sanitized = raw
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/`[^`\n]+`/g, '')
+  const sanitized = raw.replace(/```[\s\S]*?```/g, '').replace(/`[^`\n]+`/g, '')
   const wikilinks = new Set<string>()
 
   for (const match of sanitized.matchAll(WIKI_LINK_PATTERN)) {
@@ -120,7 +124,10 @@ const createWikiLinkNode = (slug: string, label: string): RemarkNode => ({
   children: [createTextNode(label)],
 })
 
-const splitWikiLinks = (value: string, wikilinks: Set<string>): RemarkNode[] => {
+const splitWikiLinks = (
+  value: string,
+  wikilinks: Set<string>,
+): RemarkNode[] => {
   const chunks: RemarkNode[] = []
   let startIndex = 0
 
@@ -155,11 +162,10 @@ const splitWikiLinks = (value: string, wikilinks: Set<string>): RemarkNode[] => 
 
 const isParentNode = (
   node: RemarkNode,
-): node is RemarkNode & { children: RemarkNode[] } => Array.isArray(node.children)
+): node is RemarkNode & { children: RemarkNode[] } =>
+  Array.isArray(node.children)
 
-const isTextNode = (
-  node: RemarkNode,
-): node is RemarkNode & { value: string } =>
+const isTextNode = (node: RemarkNode): node is RemarkNode & { value: string } =>
   node.type === 'text' && typeof node.value === 'string'
 
 const transformWikiLinks = (node: RemarkNode, wikilinks: Set<string>) => {
@@ -197,24 +203,19 @@ const wikiLinkRemarkPlugin = () => {
   }
 }
 
-const wikiLinkRemarkPluginPluggable = wikiLinkRemarkPlugin as any
-
-const baseContentSchema = s.object({
-  title: s.string(),
-  description: s.string().optional(),
-  date: s.string().optional(),
-  draft: s.boolean().default(false),
-  tags: s.array(s.string()).default([]),
-  slug: s.path(),
-  excerpt: s.excerpt(),
-  metadata: s.metadata(),
-  body: s.mdx(),
-})
+const wikiLinkMarkdownPlugin = wikiLinkRemarkPlugin as NonNullable<
+  MarkdownOptions['remarkPlugins']
+>[number]
+const wikiLinkMdxPlugin = wikiLinkRemarkPlugin as NonNullable<
+  MdxOptions['remarkPlugins']
+>[number]
 
 const blogContentSchema = s.object({
   title: s.string(),
   description: s.string().optional(),
   date: s.string(),
+  updatedAt: s.string().optional(),
+  revisions: s.array(s.string()).default([]),
   draft: s.boolean().default(false),
   tags: s.array(s.string()).default([]),
   slug: s.path(),
@@ -281,9 +282,9 @@ export default defineConfig({
     wiki,
   },
   markdown: {
-    remarkPlugins: [wikiLinkRemarkPluginPluggable],
+    remarkPlugins: [wikiLinkMarkdownPlugin],
   },
   mdx: {
-    remarkPlugins: [wikiLinkRemarkPluginPluggable],
+    remarkPlugins: [wikiLinkMdxPlugin],
   },
 })
