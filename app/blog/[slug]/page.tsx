@@ -67,18 +67,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </p>
         )}
       </header>
-      {post.revisions.length > 0 && (
-        <details className="not-prose mb-8 rounded-lg border border-zinc-200 bg-zinc-50 p-4 text-sm dark:border-zinc-800 dark:bg-zinc-900">
-          <summary className="cursor-pointer font-medium text-zinc-800 dark:text-zinc-200">
-            수정 내역
-          </summary>
-          <ul className="mt-3 list-disc space-y-2 pl-5 text-zinc-600 dark:text-zinc-300">
-            {post.revisions.map((revision) => (
-              <li key={revision}>{revision}</li>
-            ))}
-          </ul>
-        </details>
-      )}
       <MDXContent code={post.body} />
     </article>
   )
