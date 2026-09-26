@@ -3,6 +3,9 @@
 Astro에서 Next.js(App Router + MDX)로 마이그레이션한 블로그 프로젝트입니다.  
 정적 export(`out/`)를 GitHub Pages로 배포합니다.
 
+운영 주소: https://changgihong.github.io/
+사이트 URL과 메타데이터의 공통 설정은 `constants/common.ts`에서 관리합니다.
+
 ## 환경
 
 - Node.js 20+
