@@ -1,109 +1,51 @@
 ---
 title: '프로그래머스 - 혼자 놀기의 달인'
-description: '단순 구현 문제'
+description: '순열의 순환 그룹을 탐색하는 문제'
 tags:
   - series/programmers
 aliases: []
-updatedAt: 2026-02-23
+updatedAt: 2026-09-27
 ---
 
-## 프로그래머스 - 혼자 놀기의 달인
+## 문제
 
-### Link
+[프로그래머스 — 혼자 놀기의 달인](https://school.programmers.co.kr/learn/courses/30/lessons/131130)
 
-https://school.programmers.co.kr/learn/courses/30/lessons/131130
+## 접근 방법
 
-### 접근 방법
+카드 번호를 따라 상자를 열면 하나의 순환을 이루는 상자 그룹을 찾을 수 있다. 카드 번호는 1부터 시작하지만 배열 인덱스는 0부터 시작하므로, 다음 인덱스는 `cards[current] - 1`이다. 카드에 적힌 번호 자체에서 1을 빼는 규칙이 있는 것은 아니다.
 
-이 문제는 알고리즘을 딱히 활용하지 않아도 되는 단순 구현 문제이다.
+카드 번호가 중복되지 않는 순열이므로 서로 다른 그룹은 겹치지 않는다. 아직 열지 않은 상자에서 출발해 이미 열린 상자를 만날 때까지 방문하고, 그룹의 크기만 기록한다. 재귀 대신 반복문을 사용하면 호출 스택에 의존하지 않는다.
 
-지문을 읽으면서 요구사항을 정리해 보면 다음과 같다.
+모든 그룹을 찾은 뒤 가장 큰 두 그룹의 크기를 곱한다. 어느 상자에서 시작해도 해당 그룹의 크기는 같으므로, 이 두 그룹을 선택해야 최대 점수를 얻는다. 그룹이 하나뿐이면 두 번째 그룹을 선택할 수 없어 점수는 0이다.
 
-- 최소 2개, 최대 100개의 상자에 카드가 들어있다.
-- 카드는 무작위로 상자에 들어가 있고, 적힌 번호는 상자의 총 개수 이하의 자연수이다.
-- 임의의 상자를 열어서 카드 번호를 확인하면, 그 카드 번호는 `다음에 열어야 할 상자의 번호 - 1`가 된다.
-- 다음에 열어야 할 상자가 이미 열려있다면, 상자를 열어가면서 확인한 카드는 같은 그룹이 된다.
-- 게임의 점수는 두 그룹의 카드 개수를 곱한 것이다. 단, 문제에서 요구한 것은 "최대 점수"이다.
-- 만약 그룹이 한 개 뿐이라면, 게임의 점수는 0이다.
-
-정리한 요구사항 중 구현이 필요한 것들을 단순히 구현해나가면 풀리는 문제이다.
-
-### Implementation
-
-- 임의의 상자를 열어서 카드 번호를 확인하면, 그 카드 번호는 `다음에 열어야 할 상자의 번호 - 1`가 된다.
-- 다음에 열어야 할 상자가 이미 열려있다면, 상자를 열어가면서 확인한 카드는 같은 그룹이 된다.
-
-```js
-let opened = Array(cards.length).fill(false);
-let groups = [];
-const opening = (group, boxNum, cards) => {
-  if (opened[boxNum] === true) {
-    if (group.length) {
-      groups.push(group);
-    }
-    return;
-  } else {
-    opened[boxNum] = true;
-    group.push(cards[boxNum]);
-    opening(group, cards[boxNum] - 1, cards);
-  }
-};
-for (let idx = 0; idx < cards.length; idx++) {
-  opening([], idx, cards);
-}
-```
-
-- 게임의 점수는 두 그룹의 카드 개수를 곱한 것이다. 단, 문제에서 요구한 것은 "최대 점수"이다.
-
-```js
-const score = groups.map((group) => {
-  return group.length;
-});
-
-const sortedScore = score.sort((a, b) => b - a);
-```
-
-- 만약 그룹이 한 개 뿐이라면, 게임의 점수는 0이다.
-
-```js
-if (!score[1]) {
-  return 0;
-} else {
-  return sortedScore[0] * sortedScore[1];
-}
-```
-
-### Code
+## 코드
 
 ```js
 function solution(cards) {
-  let opened = Array(cards.length).fill(false);
-  let groups = [];
-  const opening = (group, boxNum, cards) => {
-    if (opened[boxNum] === true) {
-      if (group.length) {
-        groups.push(group);
-      }
-      return;
-    } else {
-      opened[boxNum] = true;
-      group.push(cards[boxNum]);
-      opening(group, cards[boxNum] - 1, cards);
+  const opened = Array(cards.length).fill(false)
+  const sizes = []
+
+  for (let start = 0; start < cards.length; start++) {
+    if (opened[start]) continue
+
+    let current = start
+    let size = 0
+    while (!opened[current]) {
+      opened[current] = true
+      size += 1
+      current = cards[current] - 1
     }
-  };
-  for (let idx = 0; idx < cards.length; idx++) {
-    opening([], idx, cards);
+    sizes.push(size)
   }
-  const score = groups.map((group) => {
-    return group.length;
-  });
 
-  const sortedScore = score.sort((a, b) => b - a);
-
-  if (!score[1]) {
-    return 0;
-  } else {
-    return sortedScore[0] * sortedScore[1];
-  }
+  sizes.sort((a, b) => b - a)
+  return sizes.length < 2 ? 0 : sizes[0] * sizes[1]
 }
 ```
+
+## 복잡도와 경계 조건
+
+상자 수가 `n`, 그룹 수가 `g`이면 탐색은 `O(n)`, 그룹 정렬은 `O(g log g)`이다. 추가 공간은 `O(n)`이다.
+
+하나의 순환으로 이루어진 경우와 모든 상자가 자기 자신을 가리키는 경우에도 각각 0과 1을 반환한다.

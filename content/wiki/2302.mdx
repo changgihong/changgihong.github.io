@@ -4,58 +4,50 @@ description: 'DP와 피보나치 수열을 활용한 좌석 배정 문제'
 tags:
   - series/boj
 aliases: []
-updatedAt: 2026-02-23
+updatedAt: 2026-09-27
 ---
 
-## BOJ - 극장 좌석
+## 문제
 
-### Link
+[BOJ — 극장 좌석](https://www.acmicpc.net/problem/2302)
 
-[https://www.acmicpc.net/problem/2302](https://www.acmicpc.net/problem/2302)
+## 접근 방법
 
-### 접근 방법
+각 사람은 자기 자리 또는 바로 옆자리에 앉을 수 있고, VIP 좌석은 고정되어 있다. VIP 좌석을 경계로 일반 좌석을 연속 구간으로 나눈다. VIP를 건너 자리를 교환할 수 없으므로 각 구간의 경우의 수는 독립이며, 전체 경우의 수는 구간별 결과의 곱이다.
 
-- 좌석 중 VIP 좌석을 기준으로 좌석 배열을 나눈 그룹에 대해 경우의 수를 계산하면 된다.
-- 그룹 내 좌석의 개수에 대해 다음과 같은 규칙성을 갖는다.
-  - 1개 : 1
-  - 2개 : 2
-  - 3개 : 3
-  - 4개 : 5
-  - … 피보나치 수열과 동일한 규칙성을 갖는다.
-- 따라서 DP 배열을 피보나치 수열에 대한 점화식으로 초기화해주고, 결과를 계산하면 끝!
+연속된 일반 좌석 `length`개의 배치 수를 `ways[length]`라고 하자. 마지막 사람이 자기 자리에 앉으면 앞의 `length - 1`개 좌석을 배치하면 된다. 왼쪽 사람과 교환하면 마지막 두 자리의 배치가 정해지고 앞의 `length - 2`개 좌석을 배치하면 된다. 두 경우는 겹치지 않으므로 다음 점화식을 얻는다.
 
-### Code
+`ways[length] = ways[length - 1] + ways[length - 2]`
+
+초깃값은 `ways[0] = 1`, `ways[1] = 1`이다. 빈 구간도 배치 방법이 하나인 것으로 처리해야, VIP 좌석이 연속되거나 양 끝에 있을 때 곱이 0이 되지 않는다.
+
+반복문으로 좌석 수까지 점화식을 계산하고, 각 VIP 앞 구간과 마지막 VIP 뒤 구간의 값을 곱한다. 모든 변수는 명시적으로 선언해 전역 변수에 의존하지 않는다.
+
+## 코드
 
 ```js
-let file = require("fs").readFileSync("/dev/stdin");
-let input = file.toString().split("\n");
-
-let n = Number(input[0]);
-let m = Number(input[1]);
-
-let d = new Array(50).fill(0);
-d[0] = 1;
-d[1] = 1;
-d[2] = 2;
-
-const dp = (x) => {
-  if (d[x] != 0) return d[x];
-  d[x] = dp(x - 1) + dp(x - 2);
-  return d[x];
-};
-
-let arr = [];
-let start = 0;
-for (let i = 2; i < m + 2; i++) {
-  end = Number(input[i]);
-  arr.push(end - 1 - start);
-  start = end;
+const fs = require('fs')
+const input = fs.readFileSync(0, 'utf8').trim().split(/\s+/).map(Number)
+const n = input[0]
+const vipCount = input[1]
+const ways = Array(n + 1).fill(1)
+for (let length = 2; length <= n; length++) {
+  ways[length] = ways[length - 1] + ways[length - 2]
 }
-arr.push(n - start);
 
-let res = 1;
-for (let x of arr) {
-  res *= dp(x);
+let answer = 1
+let previousVip = 0
+for (let i = 0; i < vipCount; i++) {
+  const vip = input[i + 2]
+  answer *= ways[vip - previousVip - 1]
+  previousVip = vip
 }
-console.log(res);
+answer *= ways[n - previousVip]
+console.log(answer)
 ```
+
+## 복잡도와 경계 조건
+
+좌석 수가 `n`, VIP 수가 `m`이면 시간은 `O(n + m)`, 추가 공간은 `O(n + m)`이다. 입력 저장 공간과 점화식 배열을 포함한 값이다.
+
+VIP가 없는 경우에는 `ways[n]`이 답이다. 모든 좌석이 VIP이거나 VIP가 연속된 경우에는 길이 0인 구간을 올바르게 처리해야 한다.

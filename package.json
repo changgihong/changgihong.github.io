@@ -54,7 +54,8 @@
     "export": "pnpm build",
     "lint": "next lint",
     "start": "next start -p 3125",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test:wiki": "node --test scripts/test-wiki-solutions.mjs"
   },
   "version": "0.1.0"
 }

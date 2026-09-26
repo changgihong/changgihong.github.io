@@ -4,65 +4,69 @@ description: '회문과 유사회문 판별 문제'
 tags:
   - series/boj
 aliases: []
-updatedAt: 2026-02-23
+updatedAt: 2026-09-27
 ---
 
-## BOJ - 회문
+## 문제
 
-### Link
+[BOJ — 회문](https://www.acmicpc.net/problem/17609)
 
-[https://www.acmicpc.net/problem/17609](https://www.acmicpc.net/problem/17609)
+## 접근 방법
 
-### 접근방법
+회문이면 0, 문자 하나를 삭제해서 회문이 되는 유사회문이면 1, 둘 다 아니면 2를 출력한다.
 
-- 그냥 단순한 회문만 확인하는게 아니라 "유사회문"에 해당하는지도 검사해야한다.
-- 유사회문은 회문이 성립하지 않는 단어에서 어떤 문자를 지우면 회문이 성립하는 단어이다.
-- 그런데 회문은 그 자체로 중간 문자에 대해 "대칭성"을 갖기 때문에, 다음과 같은 접근 방법을 생각해볼 수 있다.
-  - 어떤 단어에 대해, 우선 회문인지 검사한다. (회문 성립 시 0(회문) 출력)
-  - 회문이 아니라면, 해당 단어를 이루는 문자를 순차 탐색하면서 하나씩 지우고, 대칭되는 문자도 지운 다음에 회문인지 확인해본다. 만약 이 과정에서 회문임을 발견하면 1(유사회문)을 출력한다.
-  - 끝까지 탐색할때까지 회문임이 판별되지 않으면 2(회문, 유사회문 아님)를 출력한다.
+양 끝에 포인터를 두고 같은 문자인 동안 안쪽으로 이동한다. 끝까지 불일치가 없으면 회문이다.
 
-### Code
+처음으로 문자가 다른 위치를 `left`, `right`라고 하면 다음 두 경우만 검사하면 된다.
+
+1. 왼쪽 문자 하나를 제외한 구간 `[left + 1, right]`가 회문인지 확인한다.
+2. 오른쪽 문자 하나를 제외한 구간 `[left, right - 1]`가 회문인지 확인한다.
+
+두 문자를 동시에 삭제하는 것이 아니다. 양쪽 문자가 다르면 삭제 한 번으로 회문을 만들기 위해 둘 중 하나를 제외해야 한다. 그 전에 일치한 바깥 구간은 그대로 유지할 수 있다. 두 검사 중 하나라도 성공하면 유사회문이다.
+
+부분 문자열이나 뒤집은 배열을 만들지 않고 인덱스로 비교하면 문자열 길이에 비례한 임시 메모리 할당을 줄일 수 있다. 입력은 공백 단위로 나누어 줄 끝의 `\r`도 제거한다.
+
+## 코드
 
 ```js
-let fs = require("fs");
-let input = fs.readFileSync("/dev/stdin").toString().split("\n");
+const fs = require('fs')
+const input = fs.readFileSync(0, 'utf8').trim().split(/\s+/)
+const count = Number(input[0])
 
-const isPalindrome = (word) => {
-  return word == word.split("").reverse().join("");
-};
-
-let words = Number(input[0]);
-
-for (let w = 1; w <= words; w++) {
-  let word = input[w];
-  if (isPalindrome(word)) {
-    console.log(0);
-  } else {
-    let found = false;
-    let wordLength = word.length;
-
-    for (let i = 0; i < parseInt(wordLength / 2); i++) {
-      if (word[i] != word[wordLength - i - 1]) {
-        if (isPalindrome(word.slice(0, i) + word.slice(i + 1, wordLength))) {
-          found = true;
-        }
-        if (
-          isPalindrome(
-            word.slice(0, wordLength - i - 1) +
-              word.slice(wordLength - i, wordLength)
-          )
-        ) {
-          found = true;
-        }
-        break;
-      }
-    }
-    if (found) {
-      console.log(1);
-    } else {
-      console.log(2);
-    }
+function isPalindrome(word, left, right) {
+  while (left < right) {
+    if (word[left] !== word[right]) return false
+    left += 1
+    right -= 1
   }
+  return true
 }
+
+function classify(word) {
+  let left = 0
+  let right = word.length - 1
+  while (left < right) {
+    if (word[left] !== word[right]) {
+      return isPalindrome(word, left + 1, right) ||
+        isPalindrome(word, left, right - 1)
+        ? 1
+        : 2
+    }
+    left += 1
+    right -= 1
+  }
+  return 0
+}
+
+const answer = []
+for (let i = 1; i <= count; i++) {
+  answer.push(classify(input[i]))
+}
+console.log(answer.join('\n'))
 ```
+
+## 복잡도와 경계 조건
+
+문자열 길이가 `n`이면 한 문자열의 판별 시간은 `O(n)`, 판별 함수의 추가 공간은 `O(1)`이다. 입력과 출력 저장 공간은 별도다.
+
+왼쪽 삭제만 가능한 경우와 오른쪽 삭제만 가능한 경우를 모두 확인한다. 첫 불일치 이후의 구간 검사에서는 추가 삭제를 허용하지 않는다.

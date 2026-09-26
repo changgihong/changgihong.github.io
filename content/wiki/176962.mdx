@@ -4,53 +4,67 @@ description: '스택을 활용한 시뮬레이션 문제'
 tags:
   - series/programmers
 aliases: []
-updatedAt: 2026-02-23
+updatedAt: 2026-09-27
 ---
 
-## 프로그래머스 - 과제 진행하기
+## 문제
 
-### Link
+[프로그래머스 — 과제 진행하기](https://school.programmers.co.kr/learn/courses/30/lessons/176962)
 
-[https://school.programmers.co.kr/learn/courses/30/lessons/176962](https://school.programmers.co.kr/learn/courses/30/lessons/176962#)
+## 접근 방법
 
-### 접근 방법
+새 과제의 시작 시각이 되면 현재 과제를 멈추고 새 과제를 시작한다. 여유 시간이 생기면 가장 최근에 멈춘 과제부터 재개하므로 스택으로 남은 작업 시간을 관리한다.
 
-- 우선 문제 요구사항에 시간 순으로 정렬되어 있지 않을 수 있다고 나왔으니, 정렬을 고려해본다.
-- 과제는 시작 시간과 수행에 필요한 시간이 할당돼있으며, 과제가 끝난 순서가 반환되어야 한다.
-- 시작 시간을 기준으로 내림차순으로 정렬한다. (배열을 스택처럼 생각하면, 처음 할당되는 과제를 pop() 메소드로 뽑으면서 보고 싶으면 내림차순으로 정렬해야 한다는 것을 알 수 있음)
-- 하나씩 뽑으면서 보는데, 일단 스택(대기열)에 등록된 과제를 기준으로 시작 시간이 해당 과제의 예상 종료 시간보다 이른 시점이면 예상 종료 시간을 지연시킨다.
-- 그리고 뽑은 과제의 정보를 스택(대기열)에 등록시킨다.
-- plans에 남은 과제가 없으면 stack을 다시 (예상 종료시간을 기준으로) 오름차순으로 정렬해서 이름만 뽑아준다.
+시각을 분 단위로 변환하고 시작 시각의 오름차순으로 정렬한다. 현재 과제를 스택에 넣은 뒤, 다음 과제 시작까지 남은 시간을 사용한다.
 
-### Code
+- 스택 맨 위 과제를 끝낼 수 있으면 완료 목록에 추가하고 남은 시간으로 다음 과제를 재개한다.
+- 끝낼 수 없으면 남은 작업 시간만 줄인다. 다음 시작 시각에 새 과제를 스택 위에 넣는다.
+- 마지막 과제 이후에는 새로 시작할 과제가 없으므로 스택 위에서부터 모두 완료한다.
 
-```jsx
+남은 작업 시간과 다음 시작까지의 시간이 같다면 기존 과제를 먼저 완료 처리한다. 여유 시간이 0이 되면 멈춰둔 과제를 재개하지 않고 새 과제를 시작한다. 따라서 같은 시각의 완료와 시작도 문제의 우선순위를 따른다.
+
+## 코드
+
+```js
 function solution(plans) {
-  plans.forEach((plan) => {
-    const [hour, min] = plan[1].split(":");
-    plan[1] = hour * 60 + min * 1;
-    plan[2] = plan[2] * 1;
-  });
+  const tasks = plans
+    .map(([name, start, duration]) => {
+      const [hour, minute] = start.split(':').map(Number)
+      return [name, hour * 60 + minute, Number(duration)]
+    })
+    .sort((a, b) => a[1] - b[1])
+  const paused = []
+  const answer = []
 
-  plans.sort((a, b) => {
-    return b[1] - a[1];
-  });
+  for (let i = 0; i < tasks.length; i++) {
+    const [name, start, duration] = tasks[i]
+    paused.push([name, duration])
+    if (i === tasks.length - 1) break
 
-  const stack = [];
-
-  while (plans.length) {
-    const [name, start, playtime] = plans.pop();
-
-    stack.forEach((val, idx) => {
-      if (start < val[1]) {
-        stack[idx][1] += playtime;
+    let available = tasks[i + 1][1] - start
+    while (available > 0 && paused.length > 0) {
+      const current = paused[paused.length - 1]
+      if (current[1] <= available) {
+        available -= current[1]
+        answer.push(paused.pop()[0])
+      } else {
+        current[1] -= available
+        available = 0
       }
-    });
-    stack.push([name, start + playtime]);
+    }
   }
 
-  return stack.sort((a, b) => a[1] - b[1]).map((val) => val[0]);
+  while (paused.length > 0) answer.push(paused.pop()[0])
+  return answer
 }
 ```
 
-해당 풀이를 참고하였습니다 : https://chamdom.blog/pg2-176962/
+## 복잡도와 경계 조건
+
+과제 수가 `n`이면 정렬을 포함한 시간은 `O(n log n)`, 추가 공간은 `O(n)`이다. 각 과제는 한 번 등록되고 한 번 완료되며, 시간이 부족해 중단되는 처리는 다음 시작 시각마다 최대 한 번 발생한다.
+
+여러 과제를 재개할 만큼 긴 공백, 연속된 중단, 완료와 다음 시작 시각이 같은 경우를 확인한다. 날짜가 바뀌어도 남은 작업 시간으로 처리하므로 별도의 시각 초기화는 필요하지 않다.
+
+## 참고
+
+초기 풀이를 작성할 때 [과제 진행하기 풀이](https://chamdom.blog/pg2-176962/)를 참고했다.
