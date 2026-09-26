@@ -1,114 +1,54 @@
 ---
 title: '프로그래머스 - 호텔 대실'
-description: '문자열 처리 및 구현 문제'
+description: '청소 시간을 포함한 객실 재사용 문제'
 tags:
   - series/programmers
 aliases: []
-updatedAt: 2026-02-23
+updatedAt: 2026-09-27
 ---
 
-## 프로그래머스 - 호텔 대실
+## 문제
 
-### Link
+[프로그래머스 — 호텔 대실](https://school.programmers.co.kr/learn/courses/30/lessons/155651)
 
-https://school.programmers.co.kr/learn/courses/30/lessons/155651
+## 접근 방법
 
-### 접근 방법
+모든 예약을 수용하는 데 필요한 최소 객실 수를 구한다. 한 회의실에서 최대한 많은 회의를 선택하는 회의실 배정 문제와는 목적이 다르다.
 
-네이버, 카카오 공채 1번에 등장할 법한 문자열 처리 및 구현 문제이다.
+시각을 분 단위 숫자로 변환하고, 예약을 시작 시각의 오름차순으로 처리한다. 각 객실에는 다음 손님을 받을 수 있는 시각인 `퇴실 시각 + 10분`을 저장한다.
 
-백준 회의실 배정이랑 비슷한 문제라서 접근 방법도 아주 조~금만 다른 듯 하다.
+현재 예약의 시작 시각 이하에 청소가 끝나는 객실이 있으면 그 객실을 재사용한다. 없다면 객실을 추가한다. 재사용 가능한 객실 중 어느 것을 선택해도 된다. 이 시점에 모두 사용 중이라면 현재 예약까지 동시에 수용할 새 객실이 반드시 필요하기 때문이다.
 
-- 우선은 방의 개수가 예약 개수만큼 필요하다고 가정한다.
-- 예약 시간 목록의 원소들을 시작 시간이 빠른 순으로 정렬해준다.
-- 순서대로 탐색하며 이전 예약이 있는 경우, 해당 예약의 끝나는 시간과 현재 예약의 시작 시간을 비교한다.
-- 두 시간을 비교해서 10분 이상 차이가 난다면 이전 예약을 원래 예약 목록에서 제거한다. (이후 비교 대상에서 제거하기 위함)
-- 필요한 방의 개수에서 1을 빼준다. 끝.
+객실별 상태를 별도 배열에 저장하면 입력 예약을 변경하지 않고 방의 재사용 조건을 직접 표현할 수 있다.
 
-### Implementation
-
-- 우선은 방의 개수가 예약 개수만큼 필요하다고 가정한다.
-
-```js
-let roomCount = book_time.length;
-```
-
-- 예약 시간 목록의 원소들을 시작 시간이 빠른 순으로 정렬해준다.
-
-```js
-book_time.sort((a, b) => {
-  const first = a[0].split(":");
-  const next = b[0].split(":");
-  if (first[0] !== next[0]) {
-    return first[0] - next[0];
-  } else {
-    return first[1] - next[1];
-  }
-});
-```
-
-- 순서대로 탐색하며 이전 예약이 있는 경우, 해당 예약의 끝나는 시간과 현재 예약의 시작 시간을 비교한다.
-- 두 시간을 비교해서 10분 이상 차이가 난다면 이전 예약을 원래 예약 목록에서 제거한다. (이후 비교 대상에서 제거하기 위함)
-
-- 필요한 방의 개수에서 1을 빼준다. 끝.
-
-```js
-const isPreRoomReady = (a, b) => {
-  const aTime = a[0] * 60 + Number(a[1]);
-  const bTime = b[0] * 60 + Number(b[1]);
-  return aTime - bTime >= 10;
-};
-```
-
-```js
-for (let i = 0; i < book_time.length; i++) {
-  let curStart = book_time[i][0].split(":");
-  for (let k = 0; k < i; k++) {
-    let preEnd = book_time[k][1].split(":");
-    if (isPreRoomReady(curStart, preEnd)) {
-      book_time.splice(k, 1);
-      i -= 1;
-      roomCount -= 1;
-      break;
-    }
-  }
-}
-```
-
-### Code
+## 코드
 
 ```js
 function solution(book_time) {
-  let roomCount = book_time.length;
+  const toMinutes = (time) => {
+    const [hour, minute] = time.split(':').map(Number)
+    return hour * 60 + minute
+  }
+  const bookings = book_time
+    .map(([start, end]) => [toMinutes(start), toMinutes(end) + 10])
+    .sort((a, b) => a[0] - b[0])
+  const readyTimes = []
 
-  book_time.sort((a, b) => {
-    const first = a[0].split(":");
-    const next = b[0].split(":");
-    if (first[0] !== next[0]) {
-      return first[0] - next[0];
+  for (const [start, readyAt] of bookings) {
+    const room = readyTimes.findIndex((time) => time <= start)
+    if (room === -1) {
+      readyTimes.push(readyAt)
     } else {
-      return first[1] - next[1];
-    }
-  });
-
-  const isPreRoomReady = (a, b) => {
-    const aTime = a[0] * 60 + Number(a[1]);
-    const bTime = b[0] * 60 + Number(b[1]);
-    return aTime - bTime >= 10;
-  };
-
-  for (let i = 0; i < book_time.length; i++) {
-    let curStart = book_time[i][0].split(":");
-    for (let k = 0; k < i; k++) {
-      let preEnd = book_time[k][1].split(":");
-      if (isPreRoomReady(curStart, preEnd)) {
-        book_time.splice(k, 1);
-        i -= 1;
-        roomCount -= 1;
-        break;
-      }
+      readyTimes[room] = readyAt
     }
   }
-  return roomCount;
+
+  return readyTimes.length
 }
 ```
+
+## 복잡도와 경계 조건
+
+예약 수가 `n`이면 정렬은 `O(n log n)`, 객실 탐색은 최악의 경우 `O(n²)`이다. 추가 공간은 `O(n)`이다. 예약이 최대 1,000개인 조건에서 단순 배열 탐색을 사용했다. 더 큰 입력에서는 청소 완료 시각을 관리하는 최소 힙을 고려할 수 있다.
+
+청소가 끝나는 시각과 다음 입실 시각이 같으면 재사용할 수 있다. `23:59` 퇴실 후의 청소 완료 시각도 분 단위 숫자로 유지하며, 자정으로 되돌리지 않는다.
