@@ -13,23 +13,22 @@ function parseYearMonth(date: string): { year: number; month: number } {
   return { year, month }
 }
 
-function monthsBetween(start: string, end: string): number {
-  const startDate = parseYearMonth(start)
-  const endDate = parseYearMonth(end)
-
-  return (
-    (endDate.year - startDate.year) * 12 +
-    (endDate.month - startDate.month) +
-    1
-  )
-}
-
 export function formatTotalWorkExperience(jobs: WorkPeriod[]): string {
-  const totalMonths = jobs.reduce(
-    (sum, job) => sum + monthsBetween(job.start, job.end),
-    0,
-  )
+  const workedMonths = new Set<number>()
 
+  for (const job of jobs) {
+    const startDate = parseYearMonth(job.start)
+    const endDate = parseYearMonth(job.end)
+    const startMonth = startDate.year * 12 + startDate.month - 1
+    const endMonth = endDate.year * 12 + endDate.month - 1
+
+    // 이직한 달처럼 재직 기간이 겹치는 월은 한 번만 계산합니다.
+    for (let month = startMonth; month <= endMonth; month++) {
+      workedMonths.add(month)
+    }
+  }
+
+  const totalMonths = workedMonths.size
   const years = Math.floor(totalMonths / 12)
   const months = totalMonths % 12
 
