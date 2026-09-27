@@ -1,14 +1,13 @@
 import { AnimatedBackground } from '@/components/ui/animated-background'
 import { getBooks } from '@/lib/books'
+import { createPageMetadata } from '@/lib/page-metadata'
 import Link from 'next/link'
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'Books',
   description: '읽은 책과 서평을 기록한 목록입니다.',
-  alternates: {
-    canonical: '/books',
-  },
-}
+  path: '/books',
+})
 
 export default function BooksPage() {
   const bookList = getBooks()

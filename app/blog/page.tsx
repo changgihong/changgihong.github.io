@@ -1,14 +1,13 @@
 import { AnimatedBackground } from '@/components/ui/animated-background'
 import { getSortedBlogListItems } from '@/lib/blog'
+import { createPageMetadata } from '@/lib/page-metadata'
 import Link from 'next/link'
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: '블로그',
   description: '홍창기의 개발 블로그 글 목록입니다.',
-  alternates: {
-    canonical: '/blog',
-  },
-}
+  path: '/blog',
+})
 
 export default async function BlogIndexPage() {
   const sortedPosts = getSortedBlogListItems()

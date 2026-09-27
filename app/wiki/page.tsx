@@ -1,15 +1,14 @@
 import { getWikiPosts, getWikiTags } from '@/lib/wiki-posts'
 import { getGraph } from '@/lib/wiki-graph'
+import { createPageMetadata } from '@/lib/page-metadata'
 import { WikiList } from './wiki-list'
 import { WikiGraphDialog } from './graph-dialog'
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'Wiki',
   description: '공부 노트와 연결된 문서 목록입니다.',
-  alternates: {
-    canonical: '/wiki',
-  },
-}
+  path: '/wiki',
+})
 
 export default function WikiIndexPage() {
   const posts = getWikiPosts().map((post) => ({

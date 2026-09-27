@@ -48,6 +48,18 @@ pnpm lint
 pnpm typecheck
 ```
 
+### 6) 공유 메타데이터 검사
+
+```bash
+pnpm test:metadata
+```
+
+사이트를 빌드한 뒤 홈·목록·개별 글의 정적 HTML에서 제목, 설명, OG·Twitter 태그와 canonical URL을 검사합니다.
+
+## 로드맵
+
+후속 작업 구상은 [ROADMAP.md](./ROADMAP.md)에 기록합니다.
+
 ## 배포
 
 - GitHub Actions 워크플로우: `.github/workflows/deploy.yml`

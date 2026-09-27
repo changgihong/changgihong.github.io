@@ -5,6 +5,7 @@ import {
   normalizeBlogSlug,
 } from '@/lib/blog'
 import type { Metadata } from 'next'
+import { createPageMetadata } from '@/lib/page-metadata'
 import { notFound } from 'next/navigation'
 
 type BlogPostPageProps = {
@@ -29,13 +30,12 @@ export async function generateMetadata({
     return {}
   }
 
-  return {
+  return createPageMetadata({
     title: post.title,
     description: post.description,
-    alternates: {
-      canonical: `/blog/${slug}`,
-    },
-  }
+    path: `/blog/${normalizeBlogSlug(post.slug)}`,
+    type: 'article',
+  })
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
