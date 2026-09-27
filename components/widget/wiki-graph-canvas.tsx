@@ -1,6 +1,7 @@
 'use client'
 
 import type { WikiGraph, WikiGraphNode } from '@/lib/wiki-graph'
+import useHydrated from '@/hooks/useHydrated'
 import {
   forceCenter,
   forceCollide,
@@ -102,10 +103,7 @@ export function WikiGraphCanvas({
   const isDialog = variant === 'dialog'
   const router = useRouter()
   const { resolvedTheme } = useTheme()
-  const [themeMounted, setThemeMounted] = useState(false)
-  useEffect(() => {
-    setThemeMounted(true)
-  }, [])
+  const themeMounted = useHydrated()
   const isDark = themeMounted && resolvedTheme === 'dark'
 
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -168,9 +166,11 @@ export function WikiGraphCanvas({
   }, [graph])
 
   const [enabledTags, setEnabledTags] = useState<string[]>(tags)
-  useEffect(() => {
+  const [previousTags, setPreviousTags] = useState(tags)
+  if (tags !== previousTags) {
+    setPreviousTags(tags)
     setEnabledTags(tags)
-  }, [tags])
+  }
   const enabledTagSet = useMemo(() => new Set(enabledTags), [enabledTags])
 
   const [searchMessage, setSearchMessage] = useState('')

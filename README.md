@@ -1,6 +1,7 @@
 # changgihong.github.io
 
-Astro에서 Next.js(App Router + MDX)로 마이그레이션한 블로그 프로젝트입니다.  
+Next.js 16(App Router + MDX) 기반의 블로그 프로젝트입니다.
+
 정적 export(`out/`)를 GitHub Pages로 배포합니다.
 
 운영 주소: https://changgihong.github.io/
@@ -8,7 +9,7 @@ Astro에서 Next.js(App Router + MDX)로 마이그레이션한 블로그 프로�
 
 ## 환경
 
-- Node.js 20+
+- Node.js 22+ (배포 환경: 22)
 - pnpm 10+
 
 ## 자주 쓰는 명령어
@@ -34,12 +35,15 @@ pnpm build
 ```
 
 `next.config.mjs`의 `output: 'export'` 설정으로 `out/` 디렉토리가 생성됩니다.
+개발 서버와 프로덕션 빌드는 Next.js 16의 기본 Turbopack을 사용합니다.
 
 ### 4) 빌드 결과 로컬 확인
 
 ```bash
 pnpm start
 ```
+
+빌드한 `out/`을 정적 서버로 제공합니다. `http://localhost:3125`에서 확인합니다.
 
 ### 5) 코드 검사
 

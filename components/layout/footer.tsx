@@ -1,9 +1,9 @@
 'use client'
 import { AnimatedBackground } from '@/components/ui/animated-background'
 import { cn } from '@/lib/utils'
+import useHydrated from '@/hooks/useHydrated'
 import { MonitorIcon, MoonIcon, SunIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
 
 const THEMES_OPTIONS = [
   {
@@ -24,12 +24,8 @@ const THEMES_OPTIONS = [
 ]
 
 function ThemeSwitch() {
-  const [mounted, setMounted] = useState(false)
+  const mounted = useHydrated()
   const { theme, setTheme } = useTheme()
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
 
   if (!mounted) {
     return null
