@@ -2,6 +2,8 @@ import { MDXContent } from '@/components/mdx-content'
 import { formatWikiDate } from '@/lib/wiki-date'
 import { getBacklinks } from '@/lib/wiki-graph'
 import { getWikiPost, getWikiPosts } from '@/lib/wiki-posts'
+import { createPageMetadata } from '@/lib/page-metadata'
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -17,6 +19,22 @@ export function generateStaticParams() {
   }))
 }
 
+export async function generateMetadata({
+  params,
+}: WikiDetailPageProps): Promise<Metadata> {
+  const { slug } = await params
+  const post = getWikiPost(slug)
+
+  if (!post) return {}
+
+  return createPageMetadata({
+    title: post.title,
+    description: post.description,
+    path: `/wiki/${post.slugAsParams}`,
+    type: 'article',
+  })
+}
+
 export default async function WikiDetailPage({ params }: WikiDetailPageProps) {
   const { slug } = await params
   const post = getWikiPost(slug)
@@ -30,14 +48,14 @@ export default async function WikiDetailPage({ params }: WikiDetailPageProps) {
   return (
     <main className="pb-20">
       <div className="mb-4">
-        <a
+        <Link
           href="/wiki"
           className="text-sm text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
           {'<'} Wiki
-        </a>
+        </Link>
       </div>
-      <article className="prose prose-gray max-w-none break-words dark:prose-invert prose-h1:text-xl prose-h1:font-medium prose-h2:mt-12 prose-h2:text-lg prose-h2:font-medium prose-h3:text-base prose-h3:font-medium prose-pre:border prose-pre:border-zinc-200 prose-pre:bg-zinc-100 prose-pre:text-zinc-800 dark:prose-pre:border-zinc-800 dark:prose-pre:bg-zinc-900 dark:prose-pre:text-zinc-100">
+      <article className="prose prose-gray dark:prose-invert prose-h1:text-xl prose-h1:font-medium prose-h2:mt-12 prose-h2:text-lg prose-h2:font-medium prose-h3:text-base prose-h3:font-medium prose-pre:border prose-pre:border-zinc-200 prose-pre:bg-zinc-100 prose-pre:text-zinc-800 dark:prose-pre:border-zinc-800 dark:prose-pre:bg-zinc-900 dark:prose-pre:text-zinc-100 max-w-none break-words">
         <h1>{post.title}</h1>
         {post.description && (
           <p className="mt-2 text-zinc-600">{post.description}</p>
@@ -74,7 +92,7 @@ export default async function WikiDetailPage({ params }: WikiDetailPageProps) {
               >
                 <Link
                   href={`/wiki/${backlink.slugAsParams}`}
-                  className="break-words text-sm text-zinc-700 underline-offset-2 transition-colors hover:text-zinc-900 hover:underline dark:text-zinc-300 dark:hover:text-zinc-100"
+                  className="text-sm break-words text-zinc-700 underline-offset-2 transition-colors hover:text-zinc-900 hover:underline dark:text-zinc-300 dark:hover:text-zinc-100"
                 >
                   {backlink.title}
                 </Link>
