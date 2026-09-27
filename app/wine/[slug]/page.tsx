@@ -61,7 +61,7 @@ export default async function WineNotePage({ params }: WineNotePageProps) {
       <article className="mt-6">
         <header className="mb-8 border-b border-zinc-200 pb-6 dark:border-zinc-800">
           <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">
-            Tasting Note
+            {note.earlyRecord ? '초기 시음 기록' : 'Tasting Note'}
           </p>
           <h1 className="text-xl font-semibold break-words text-zinc-900 dark:text-zinc-100">
             {note.title}
@@ -75,7 +75,8 @@ export default async function WineNotePage({ params }: WineNotePageProps) {
             </span>
             {note.rating !== undefined && (
               <span className="rounded-full bg-zinc-100 px-3 py-1 text-zinc-700 tabular-nums dark:bg-zinc-900 dark:text-zinc-300">
-                내 평점 {note.rating.toFixed(1)} / 5
+                {note.earlyRecord ? '당시 평점' : '내 평점'}{' '}
+                {note.rating.toFixed(1)} / 5
               </span>
             )}
           </div>
