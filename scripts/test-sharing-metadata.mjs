@@ -85,6 +85,13 @@ const pages = [
     description: '읽은 책과 서평을 기록한 목록입니다.',
     type: 'website',
   },
+  {
+    path: '/wine',
+    title: 'Wine',
+    description:
+      '마신 와인의 향과 맛, 시간에 따른 변화와 음식 궁합을 기록합니다.',
+    type: 'website',
+  },
   ...loadCollection('blog')
     .filter((post) => !post.draft)
     .map((post) => ({
@@ -105,6 +112,14 @@ const pages = [
     description: book.summary,
     type: 'article',
   })),
+  ...loadCollection('wine')
+    .filter((note) => !note.draft)
+    .map((note) => ({
+      path: `/wine/${note.slug}`,
+      title: note.title,
+      description: note.description,
+      type: 'article',
+    })),
 ]
 
 for (const { path, title, description, type } of pages) {

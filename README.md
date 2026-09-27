@@ -60,6 +60,14 @@ pnpm test:metadata
 
 후속 작업 구상은 [ROADMAP.md](./ROADMAP.md)에 기록합니다.
 
+## 와인 노트 작성
+
+`content/wine/`에 MDX 파일을 추가하면 홈과 Wine 목록, 상세 페이지에 반영됩니다. 파일명에는 시음 날짜를 포함해 같은 와인을 다시 마신 기록도 별도로 남길 수 있습니다.
+
+첫 노트의 frontmatter를 참고해 `title`, `description`, `producer`, `tastedAt`(시음 날짜), `date`(게시 날짜)를 작성합니다. `rating`은 선택 항목인 개인 평점(0–5)이며, `decanted`는 디켄팅 여부입니다. `vintage`, `country`, `region`, `updatedAt`도 선택 항목입니다. `draft: true`인 노트는 목록·상세 페이지·sitemap에서 제외됩니다.
+
+본문의 항목은 자유롭게 작성하고, 메타데이터에서 제목과 설명을 공유 미리보기에 사용합니다.
+
 ## 배포
 
 - GitHub Actions 워크플로우: `.github/workflows/deploy.yml`
