@@ -68,6 +68,8 @@ pnpm test:metadata
 
 본문의 항목은 자유롭게 작성하고, 메타데이터에서 제목과 설명을 공유 미리보기에 사용합니다.
 
+예전의 짧은 기록은 `earlyRecord: true`로 표시하면 목록과 상세 페이지에 ‘초기 시음 기록’, 점수에는 ‘당시 평점’이 표시됩니다. 당시 메모를 보존하고, 남기지 않은 시음 항목은 생략합니다.
+
 ## 배포
 
 - GitHub Actions 워크플로우: `.github/workflows/deploy.yml`

@@ -3,7 +3,7 @@ import { wine } from '#site/content'
 export type WineNote = (typeof wine)[number]
 export type WineListItem = Pick<
   WineNote,
-  'slug' | 'title' | 'description' | 'tastedAt' | 'rating'
+  'slug' | 'title' | 'description' | 'tastedAt' | 'rating' | 'earlyRecord'
 >
 
 export function getWineNotes(): WineNote[] {
@@ -22,12 +22,13 @@ export function getWineNoteBySlug(slug: string): WineNote | undefined {
 
 export function getWineListItems(): WineListItem[] {
   return getWineNotes().map(
-    ({ slug, title, description, tastedAt, rating }) => ({
+    ({ slug, title, description, tastedAt, rating, earlyRecord }) => ({
       slug,
       title,
       description,
       tastedAt,
       rating,
+      earlyRecord,
     }),
   )
 }

@@ -258,6 +258,7 @@ const wine = defineCollection({
     updatedAt: s.isodate().optional(),
     rating: s.number().min(0).max(5).optional(),
     decanted: s.boolean().optional(),
+    earlyRecord: s.boolean().default(false),
     draft: s.boolean().default(false),
     slug: s.path().transform((slug) => slug.replace(/^wine\//, '')),
     body: s.mdx(),

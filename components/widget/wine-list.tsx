@@ -33,6 +33,11 @@ export function WineList({
             className="-mx-3 min-w-0 rounded-xl px-3 py-3 break-words"
           >
             <div className="flex flex-col gap-2">
+              {note.earlyRecord && (
+                <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  초기 시음 기록
+                </p>
+              )}
               <Heading className="text-base font-normal dark:text-zinc-100">
                 {note.title}
               </Heading>
@@ -48,7 +53,8 @@ export function WineList({
                 </span>
                 {note.rating !== undefined && (
                   <span className="tabular-nums">
-                    내 평점 {note.rating.toFixed(1)} / 5
+                    {note.earlyRecord ? '당시 평점' : '내 평점'}{' '}
+                    {note.rating.toFixed(1)} / 5
                   </span>
                 )}
               </div>
