@@ -3,6 +3,7 @@ import { getSortedBlogListItems } from '@/lib/blog'
 import { getBooks } from '@/lib/books'
 import { getWikiPosts } from '@/lib/wiki-posts'
 import { getGraph } from '@/lib/wiki-graph'
+import { getWineListItems } from '@/lib/wine'
 
 export default function HomePage() {
   const blogPosts = getSortedBlogListItems()
@@ -30,6 +31,7 @@ export default function HomePage() {
       blogPosts={blogPosts}
       recentBooks={recentBooks}
       recentWikiPosts={recentWikiPosts}
+      recentWineNotes={getWineListItems().slice(0, 3)}
       graph={graph}
     />
   )

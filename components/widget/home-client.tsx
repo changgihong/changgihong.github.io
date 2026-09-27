@@ -18,6 +18,8 @@ import type { BlogListItem } from '@/lib/blog'
 import type { WikiGraph } from '@/lib/wiki-graph'
 import { formatTotalWorkExperience } from '@/lib/work-experience'
 import { formatWikiDate } from '@/lib/wiki-date'
+import type { WineListItem } from '@/lib/wine'
+import { WineList } from '@/components/widget/wine-list'
 import { motion } from 'motion/react'
 import Link from 'next/link'
 import { EMAIL, SOCIAL_LINKS, WORK_EXPERIENCE } from '../../constants/data'
@@ -79,6 +81,7 @@ export default function HomeClient({
   blogPosts,
   recentBooks,
   recentWikiPosts,
+  recentWineNotes,
   graph,
 }: {
   blogPosts: BlogListItem[]
@@ -94,6 +97,7 @@ export default function HomeClient({
     updatedAt: string
   }[]
   graph: WikiGraph
+  recentWineNotes: WineListItem[]
 }) {
   return (
     <motion.main
@@ -323,6 +327,22 @@ export default function HomeClient({
             ))}
           </AnimatedBackground>
         </div>
+      </motion.section>
+
+      <motion.section
+        variants={VARIANTS_SECTION}
+        transition={TRANSITION_SECTION}
+      >
+        <div className="mb-3 flex items-center justify-between">
+          <h3 className="text-lg font-medium dark:text-zinc-100">Wine</h3>
+          <Link
+            href="/wine"
+            className="text-sm text-zinc-500 transition-colors hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200"
+          >
+            More {'>'}
+          </Link>
+        </div>
+        <WineList notes={recentWineNotes} heading="h4" />
       </motion.section>
 
       <motion.section

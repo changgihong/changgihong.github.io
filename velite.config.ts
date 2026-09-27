@@ -243,6 +243,27 @@ const books = defineCollection({
   }),
 })
 
+const wine = defineCollection({
+  name: 'WineNote',
+  pattern: 'wine/**/*.{md,mdx}',
+  schema: s.object({
+    title: s.string(),
+    description: s.string(),
+    producer: s.string(),
+    vintage: s.string().optional(),
+    country: s.string().optional(),
+    region: s.string().optional(),
+    tastedAt: s.isodate(),
+    date: s.isodate(),
+    updatedAt: s.isodate().optional(),
+    rating: s.number().min(0).max(5).optional(),
+    decanted: s.boolean().optional(),
+    draft: s.boolean().default(false),
+    slug: s.path().transform((slug) => slug.replace(/^wine\//, '')),
+    body: s.mdx(),
+  }),
+})
+
 const wiki = defineCollection({
   name: 'Wiki',
   pattern: 'wiki/**/*.{md,mdx}',
@@ -280,6 +301,7 @@ export default defineConfig({
     blog,
     books,
     wiki,
+    wine,
   },
   markdown: {
     remarkPlugins: [wikiLinkMarkdownPlugin],

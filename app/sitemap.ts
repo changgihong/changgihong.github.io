@@ -2,6 +2,7 @@ import { WEBSITE_URL } from '@/constants/common'
 import { getPublishedBlogPosts, normalizeBlogSlug } from '@/lib/blog'
 import { getBooks } from '@/lib/books'
 import { getWikiPosts } from '@/lib/wiki-posts'
+import { getWineNotes } from '@/lib/wine'
 import type { MetadataRoute } from 'next'
 
 export const dynamic = 'force-static'
@@ -28,6 +29,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'weekly',
       priority: 0.8,
     },
+    {
+      url: `${WEBSITE_URL}/wine`,
+      changeFrequency: 'weekly',
+      priority: 0.8,
+    },
   ]
 
   const blogPosts = getPublishedBlogPosts()
@@ -51,5 +57,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.6,
   }))
 
-  return [...routes, ...posts, ...bookEntries, ...wikiEntries]
+  const wineEntries: MetadataRoute.Sitemap = getWineNotes().map((note) => ({
+    url: `${WEBSITE_URL}/wine/${note.slug}`,
+    lastModified: note.updatedAt ?? note.date,
+    changeFrequency: 'monthly',
+    priority: 0.7,
+  }))
+
+  return [...routes, ...posts, ...bookEntries, ...wikiEntries, ...wineEntries]
 }
